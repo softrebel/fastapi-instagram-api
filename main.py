@@ -10,6 +10,8 @@ dotenv_path = Path('.env.local')
 load_dotenv(dotenv_path=dotenv_path)
 
 
+from configs.database import db
+
 
 app = FastAPI()
 @app.get('/')
