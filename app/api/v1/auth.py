@@ -7,6 +7,6 @@ router = APIRouter()
 async def login():
     pass
 
-@roputer.post('/register')
+@router.post('/register')
 async def register():
     pass
