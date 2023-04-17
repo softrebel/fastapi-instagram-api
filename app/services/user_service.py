@@ -1,18 +1,20 @@
 from app.models import User
 from app.configs import db
+from fastapi.encoders import jsonable_encoder
+from app.models.user import User,UserInput
 
 class UserService:
     def __init__(self):
-        self.session = Session()
+        pass
 
-    def get_my_model(self, id: int) -> User:
-        return self.session.query(MyModel).filter(MyModel.id == id).first()
+    async def get_user(self, id: int) -> User:
+        users = await db["user"].find().to_list()
+        return users
 
-    def create_my_model(self, data: dict) -> User:
-        my_model = MyModel(**data)
-        self.session.add(my_model)
-        self.session.commit()
-        return my_model
+    async def create_user(self, user:UserInput) -> User:
+        new_user = await db["user"].insert_one(user)
+        created_user = await db["user"].find_one({"_id": new_user.inserted_id})
+        return User(**created_user)
 
     def login(self,username:str,password:str) -> User:
         pass
