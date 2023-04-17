@@ -1,2 +1,2 @@
-from user import *
-from ig import *
+from .user import *
+from .ig import *
