@@ -1,11 +1,13 @@
 from typing import Union
-from fastapi import FastAPI
+from fastapi import FastAPI,Depends
 import uvicorn
 import os
 from dotenv import load_dotenv
 from pathlib import Path
 from app.api.v1 import auth,user
 
+from fastapi.security import OAuth2PasswordBearer
+from typing_extensions import Annotated
 
 # import environment variables
 dotenv_path = Path('.env.local')
@@ -18,9 +20,14 @@ app.include_router(auth.router, prefix="/v1")
 app.include_router(user.router, prefix="/v1")
 
 
+
+
+
 @app.get('/')
 def root():
     return {"Hello":"World"}
+
+
 
 
 
