@@ -22,8 +22,12 @@ class Response():
     def ok(data={},message='successful'):
         return Response.get_response(message,data,status.HTTP_200_OK)
     @staticmethod
-    def error(data={},message='bad request'):
+    def bad_request(data={},message='bad request'):
         return Response.get_response(message,data,status.HTTP_400_BAD_REQUEST)
+    @staticmethod
+    def server_error(data={},message='bad request'):
+        return Response.get_response(message,data,status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @staticmethod
     def created(data={},message='Item Created'):
         return Response.get_response(message,data,status.HTTP_201_CREATED)
