@@ -4,4 +4,12 @@ A simple project for authorize and login to instagram
 
 ## Requirements:
 - python 3.8
-- install dependencies using `pip install -r requirements.txt' 
+- install dependencies using `pip install -r requirements.txt`
+
+
+
+## Future Work
+- Implement Repositry Pattern to interact with database
+- Implement IOC Container
+- Implement Database driver pattern
+- Implement Redis Cache
