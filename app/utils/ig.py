@@ -9,26 +9,28 @@ class InstagramHandler():
     def __init__(self):
         self.csrf_token = None
         self.session_id = None
-        self.csrf_link = 'https://www.instagram.com/api/v1/web/qp/batch_fetch_web/'
+        self.config = 'https://www.instagram.com/data/shared_data/'
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",
             "X-Xequested-Xith": "XMLHttpRequest",
             "Referer": "https://www.instagram.com/",
             "Content-Type": "application/x-www-form-urlencoded",
             "Host": "www.instagram.com",
-            "Origin": "https://www.instagram.com"
+            "Origin": "https://www.instagram.com",
+
         }
 
         self.is_proxy_enabled = os.getenv("IS_PROXY_ENABLED")
         self.login_url = f"https://www.instagram.com/accounts/login/ajax/"
         self.payload = {
             'username': '{username}',
-            'enc_password': 'PWD_INSTAGRAM_BROWSER:0:{time}:{password}',
+            'enc_password': '#PWD_INSTAGRAM_BROWSER:0:{time}:{password}',
             'queryParams': "{}",
             'optIntoOneTap': 'false',
             'stopDeletionNonce': "",
             'trustedDeviceRecords': "{}"
         }
+        self.cookies={}
 
     def login(self,username, password):
         time = int(datetime.now().timestamp())
@@ -59,6 +61,7 @@ class InstagramHandler():
             print("csrf_token: ", self.csrf_token)
             self.session_id = cookie_jar['sessionid']
             print("session_id: ", self.session_id)
+            self.cookies=response.cookies
         else:
             raise LoginFailedException("login information is incorrect", response.text)
 
@@ -70,6 +73,14 @@ class InstagramHandler():
                 'https': os.getenv("PROXY_HTTPS"),
             }
 
-        response = requests.get(self.csrf_link, **arugments)
-        self.csrf_token = response.cookies['csrftoken']
+        response = requests.get(self.config, **arugments)
+        config=json.loads(response.text)
+        csrf = config['config']['csrf_token']
+        self.csrf_token = csrf
+
+
+    def get_user_info(self,username):
+        pass
+    def get_followers(self,username):
+        pass
 
