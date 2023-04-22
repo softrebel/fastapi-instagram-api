@@ -9,7 +9,7 @@ class InstagramHandler():
     def __init__(self):
         self.csrf_token = None
         self.session_id = None
-        self.config = 'https://www.instagram.com/data/shared_data/'
+        self.config_link = 'https://www.instagram.com/data/shared_data/'
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36",
             "X-Xequested-Xith": "XMLHttpRequest",
@@ -31,6 +31,8 @@ class InstagramHandler():
             'trustedDeviceRecords': "{}"
         }
         self.cookies={}
+
+        self.link_info='https://www.instagram.com/api/v1/users/web_profile_info/?username={username}&='
 
     def login(self,username, password):
         time = int(datetime.now().timestamp())
@@ -73,14 +75,24 @@ class InstagramHandler():
                 'https': os.getenv("PROXY_HTTPS"),
             }
 
-        response = requests.get(self.config, **arugments)
+        response = requests.get(self.config_link, **arugments)
         config=json.loads(response.text)
         csrf = config['config']['csrf_token']
         self.csrf_token = csrf
 
 
     def get_user_info(self,username):
-        pass
+        arugments = {'headers': self.headers}
+        if self.is_proxy_enabled:
+            arugments['proxies'] = {
+                'http': os.getenv("PROXY_HTTP"),
+                'https': os.getenv("PROXY_HTTPS"),
+            }
+
+
+        response = requests.get(self.link_info,cookies=self.cookies, **arugments)
+        info=json.loads(response.text)
+        return info
     def get_followers(self,username):
         pass
 
