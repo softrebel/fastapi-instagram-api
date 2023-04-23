@@ -1,13 +1,14 @@
-from pydantic import BaseModel,Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr
 from bson import ObjectId
-from typing import Optional, List
+from typing import Optional, List, Union
 from app.utils.custom_types import PyObjectId
 
+
+
+
+
 class IgBase(BaseModel):
-    account: str = Field(...)
-    password: str = Field(...)
-    cookie: str = Field(...)
-    user_id: PyObjectId = Field(default_factory=PyObjectId)
+    username: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -15,32 +16,54 @@ class IgBase(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "account": "Jane Doe",
-                "password": "",
-                "cookie": "",
-                "user_id": "",
+                "ig": "",
             }
         }
 
 
-
 class IgInput(IgBase):
-    account: Optional[str]
-    password: Optional[str]
-    cookie: Optional[str]
-    user_id: Optional[PyObjectId]
+    username: str = Field(...)
+    password: str = Field(...)
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "account": "Jane Doe",
+                "username": "",
                 "password": "",
-                "cookie": "",
-                "user_id": "",
             }
         }
 
+
 class Ig(IgBase):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    ig_id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    username: str = Field(...)
+    is_expired: Union[bool, None] = None
+    cookies:Optional[dict] = Field(...)
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "username": "",
+                "password": "",
+                "is_expired":False,
+                'ig_id':'',
+                'cookies':{}
+            }
+        }
+
+class IgViewModel(IgBase):
+    ig_id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    username: str = Field(...)
+    is_expired: Union[bool, None] = None
+    cookies:Optional[dict] = Field(...)
+    schema_extra = {
+            "example": {
+                "username": "",
+                "is_expired":False,
+                'ig_id':'',
+                'cookies':{}
+            }
+        }

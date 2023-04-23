@@ -4,7 +4,7 @@ import uvicorn
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-from app.api.v1 import auth,user
+from app.api.v1 import auth,user,ig
 
 from fastapi.security import OAuth2PasswordBearer
 from typing_extensions import Annotated
@@ -18,8 +18,7 @@ app = FastAPI()
 
 app.include_router(auth.router, prefix="/v1")
 app.include_router(user.router, prefix="/v1")
-
-
+app.include_router(ig.router, prefix="/v1")
 
 
 
