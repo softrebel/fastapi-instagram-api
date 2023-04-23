@@ -12,6 +12,7 @@ service=UserService()
 router = APIRouter()
 
 from app.configs.database import db
+from app.utils.auth import *
 
 @router.post('/user', response_description="Add new user")
 async def insert_user(user: UserCreating = Body(...)) -> ResponseModel :
@@ -22,12 +23,7 @@ async def insert_user(user: UserCreating = Body(...)) -> ResponseModel :
         disabled=user.disabled,
         hashed_password=hashed_password
         )
-        item = jsonable_encoder(item)
-        new_user = await db["user"].insert_one(item)
-        created_user = await db["user"].find_one({"_id": new_user.inserted_id})
-        # created_user = await service.create_user(user)
-        created_user=UserViewModel(**created_user)
-        # return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
+        created_user = await service.create_user(item)
         return Response.created(created_user)
     except Exception as e:
         print(e)

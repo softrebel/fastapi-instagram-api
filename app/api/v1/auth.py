@@ -2,51 +2,30 @@ from datetime import datetime, timedelta
 from typing import Union
 from typing_extensions import Annotated
 from fastapi import APIRouter
-from app.models import User
+from app.models.user import UserViewModel,User
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from fastapi import Depends, FastAPI, HTTPException, status
-
-from passlib.context import CryptContext
-from app.configs.authentication import *
-from app.models import Token,TokenData
+from app.services.auth_service import AuthService
+from app.utils.auth import *
 
 from app.configs import db
 
 router = APIRouter()
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/token")
-
-
-
-
-async def get_user(username: str):
-    user = await db["user"].find_one({"username": username})
-    if user:
-        return User(**user)
-
-
-async def authenticate_user(username: str, password: str):
-    user = await get_user(username)
+async def authenticate_user(username: str, password: str) -> UserViewModel:
+    service = AuthService()
+    user = await service.get_user(username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
         return False
-    return user
-
-
-def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
+    output = UserViewModel(id=user.id,
+                           username=user.username,
+                           disabled=user.disabled,
+                           fullname=user.fullname)
+    return output
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
@@ -63,18 +42,24 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+    service = AuthService()
+    user = await service.get_user(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
+
+
 
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)]
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
+    output = UserViewModel(id=current_user.id,
+                           username=current_user.username,
+                           disabled=current_user.disabled,
+                           fullname=current_user.fullname)
+    return output
 
 
 @router.post('/auth')
@@ -96,6 +81,8 @@ async def login_for_access_token(
 
 
 
+
+
 @router.get("/auth/me")
-async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]):
+async def read_users_me(current_user: Annotated[User, Depends(get_current_active_user)]) -> UserViewModel:
     return current_user

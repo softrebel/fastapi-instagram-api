@@ -79,7 +79,6 @@ class UserViewModel(BaseModel):
     username: Optional[str]
     disabled: Optional[bool]
     fullname: Optional[str]
-    disabled: Optional[bool]
 
 
 
