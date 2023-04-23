@@ -61,6 +61,7 @@ class InstagramHandler():
         arugments['data'] = pyaload
         response = requests.post(self.login_url, **arugments)
         if response.status_code != 200:
+            print(response.text)
             raise Exception("could not login")
         response_json = json.loads(response.text)
         if response_json["authenticated"]:

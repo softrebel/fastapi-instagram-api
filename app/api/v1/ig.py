@@ -5,6 +5,7 @@ from app.models.ig import *
 from app.utils.response import Response
 from app.models import ResponseModel
 from app.utils import InstagramHandler,LoginFailedException
+from app.services.ig_service import IgService
 router = APIRouter()
 
 @router.post('/ig')
@@ -15,13 +16,11 @@ async def login_ig_account(ig: IgInput = Body(...)) -> ResponseModel:
         ig_handler=InstagramHandler()
         ig_handler.login(ig.username,ig.password)
 
-
         item = Ig(username=ig.username,
                 cookies=ig_handler.cookies)
-        item = jsonable_encoder(item)
-        new_ig = await db["account"].insert_one(item)
-        created_ig = await db["account"].find_one({"_id": new_ig.inserted_id})
-        created_ig=IgViewModel(**created_ig)
+
+        service = IgService()
+        created_ig = await service.create_ig_account(item)
         return Response.created(created_ig)
 
     except LoginFailedException as e:
@@ -32,12 +31,13 @@ async def login_ig_account(ig: IgInput = Body(...)) -> ResponseModel:
 @router.get('/ig/{username}/id/{id}/followers')
 async def get_ig_followers(username:str,id:str):
     try:
-        ig = await db["account"].find_one({"_id": id})
+        service = IgService()
+        ig = await service.get_ig_account(id)
         if not ig:
             raise HTTPException(status_code=400, detail="instagram id not exists.")
         followers={}
         ig_handler=InstagramHandler()
-        ig_handler.cookies=ig['cookies']
+        ig_handler.cookies=ig.cookies
         followers=ig_handler.get_followers(username)
         return Response.ok(followers)
     except Exception as e:

@@ -13,6 +13,8 @@ A simple project for authorize and login to instagram
 
 ## Future Work
 - Encapsulate requests in Ig model
+- Change print to logging
+- Add middlewares to support logging and error handling
 - Implement Repositry Pattern to interact with database
 - Implement IOC Container
 - Implement Database driver pattern
