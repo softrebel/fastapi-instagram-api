@@ -15,24 +15,21 @@ from app.configs.database import db
 
 @router.post('/user', response_description="Add new user")
 async def insert_user(user: UserCreating = Body(...)) -> ResponseModel :
-    hashed_password=get_password_hash(user.password)
-    item = UserInput(fullname=user.fullname,
-    username=user.username,
-    disabled=user.disabled,
-    hashed_password=hashed_password
-    )
-    item = jsonable_encoder(item)
-    new_user = await db["user"].insert_one(item)
-    created_user = await db["user"].find_one({"_id": new_user.inserted_id})
-    # created_user = await service.create_user(user)
-    created_user=UserViewModel(**created_user)
-    # return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
-    return Response.created(created_user)
+    try:
+        hashed_password=get_password_hash(user.password)
+        item = UserInput(fullname=user.fullname,
+        username=user.username,
+        disabled=user.disabled,
+        hashed_password=hashed_password
+        )
+        item = jsonable_encoder(item)
+        new_user = await db["user"].insert_one(item)
+        created_user = await db["user"].find_one({"_id": new_user.inserted_id})
+        # created_user = await service.create_user(user)
+        created_user=UserViewModel(**created_user)
+        # return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
+        return Response.created(created_user)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error on insert user")
 
-@router.get('/user')
-async def get_user():
-    pass
-
-@router.get('/user/{id}')
-async def get_user(id):
-    pass

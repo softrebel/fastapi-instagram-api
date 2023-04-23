@@ -94,9 +94,6 @@ async def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post('/auth/register')
-async def register():
-    pass
 
 
 @router.get("/auth/me")
