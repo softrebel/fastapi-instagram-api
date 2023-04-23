@@ -114,8 +114,20 @@ class InstagramHandler():
             raise Exception('data is not available')
         id = info['data']['user']['id']
         url = self.link_follower.format(user_id=id)
+
+        headers = self.headers
+        headers['X-CSRFToken'] = self.csrf_token
+        arugments = {'headers': headers}
+
+        if self.is_proxy_enabled:
+            arugments['proxies'] = {
+                'http': os.getenv("PROXY_HTTP"),
+                'https': os.getenv("PROXY_HTTPS"),
+            }
+
+
         response = requests.get(
-            url, cookies=self.cookies, verify=False)
+            url, cookies=self.cookies, **arugments)
         res = json.loads(response.text)
         users = [{"username": item['username']} for item in res['users']]
         return users
