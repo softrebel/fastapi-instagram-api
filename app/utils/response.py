@@ -12,8 +12,9 @@ class Response():
     def get_response(message,data={},status_code=status.HTTP_200_OK):
         response={
             'message':message,
-            'data':data,
-            'status':status_code
+            'status':status_code,
+            'data':data
+
         }
         json_response = json.loads(json_util.dumps(response))
         # json_response =response
