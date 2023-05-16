@@ -1,5 +1,5 @@
-# fastapi-sample-project
-A simple project for authorize and login to instagram
+# fastapi-instagram-api
+A simple project to use instagram apis such as login, get followers, following and etc.
 
 
 ## Requirements:
